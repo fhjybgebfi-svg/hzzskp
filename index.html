@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0f" />
+  <title>Gpyth Chat — Masuk</title>
+
+  <!-- MAIN STYLESHEET (PART 2 akan mengisi style.css) -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- CRITICAL INLINE CSS (agar loading screen tetap hidup sebelum style.css masuk) -->
+  <style>
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body {
+      min-height: 100vh;
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0a0a0f;
+      color: #e0e0e0;
+      -webkit-font-smoothing: antialiased;
+      overscroll-behavior: none;
+    }
+    .hidden { display: none !important; }
+
+    /* ==== LOADING SCREEN ==== */
+    #loadingScreen {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(ellipse at center, #1a0033 0%, #0a0a0f 75%);
+      transition: opacity .4s ease;
+    }
+    #loadingScreen.fade-out { opacity: 0; pointer-events: none; }
+
+    .loading-ring {
+      width: 84px; height: 84px;
+      border: 3px solid rgba(0, 255, 200, .18);
+      border-top-color: #00ffc8;
+      border-radius: 50%;
+      animation: gpyth-spin 1s linear infinite;
+      box-shadow: 0 0 30px rgba(0, 255, 200, .4), inset 0 0 20px rgba(0, 255, 200, .15);
+    }
+    .loading-text {
+      margin-top: 26px;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #00ffc8;
+      text-shadow: 0 0 14px rgba(0, 255, 200, .8), 0 0 40px rgba(0, 255, 200, .35);
+      animation: gpyth-pulse 2s ease-in-out infinite;
+    }
+    .loading-sub {
+      margin-top: 10px;
+      color: #777;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+    }
+    @keyframes gpyth-spin { to { transform: rotate(360deg); } }
+    @keyframes gpyth-pulse {
+      0%, 100% { opacity: 1; }
+      50%      { opacity: .55; }
+    }
+
+    /* ==== FALLBACK RINGKAS UNTUK SCREEN AUTH (kalau style.css belum ada) ==== */
+    .screen {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      overflow-y: auto;
+    }
+    .card {
+      width: 100%;
+      max-width: 420px;
+      background: rgba(20, 20, 32, .96);
+      border: 1px solid rgba(0, 255, 200, .18);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: 0 0 40px rgba(0, 255, 200, .10);
+    }
+    .brand {
+      color: #00ffc8;
+      font-size: 26px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-align: center;
+      text-shadow: 0 0 12px rgba(0, 255, 200, .55);
+      margin-bottom: 6px;
+    }
+    .brand-sub {
+      text-align: center;
+      color: #666;
+      font-size: 12px;
+      letter-spacing: 2px;
+      margin-bottom: 20px;
+    }
+    h2 { font-size: 17px; text-align: center; margin-bottom: 14px; color: #ccc; }
+    .auth-form { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+    .auth-form input {
+      background: rgba(0, 0, 0, .45);
+      border: 1px solid rgba(0, 255, 200, .18);
+      color: #fff;
+      padding: 14px 16px;
+      border-radius: 12px;
+      font-size: 15px;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .auth-form input:focus {
+      border-color: #00ffc8;
+      box-shadow: 0 0 0 3px rgba(0, 255, 200, .15);
+    }
+    .btn-primary, .btn-secondary, .btn-ghost {
+      display: block;
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      font-family: inherit;
+      transition: transform .15s, box-shadow .15s, background .2s;
+    }
+    .btn-primary {
+      background: linear-gradient(135deg, #00ffc8, #00b894);
+      color: #0a0a0f;
+    }
+    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(0, 255, 200, .35); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: transparent;
+      border: 1px solid rgba(0, 255, 200, .3);
+      color: #00ffc8;
+    }
+    .btn-secondary:hover { background: rgba(0, 255, 200, .08); }
+    .btn-ghost {
+      background: transparent;
+      color: #888;
+      text-decoration: underline;
+      font-weight: 500;
+      padding: 10px;
+    }
+    .error {
+      color: #ff4d6d;
+      font-size: 13px;
+      text-align: center;
+      padding: 10px 12px;
+      border-radius: 10px;
+      background: rgba(255, 77, 109, .08);
+      border: 1px solid rgba(255, 77, 109, .2);
+      margin-top: 12px;
+      display: none;
+      line-height: 1.4;
+    }
+    .error.show { display: block; }
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #555;
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      margin: 18px 0;
+    }
+    .divider::before, .divider::after {
+      content: "";
+      flex: 1;
+      height: 1px;
+      background: rgba(255, 255, 255, .08);
+    }
+    .tnc-content {
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: #b0b0b0;
+      max-height: 45vh;
+      overflow-y: auto;
+      padding-right: 6px;
+      margin-bottom: 18px;
+    }
+    .tnc-content p { margin-bottom: 10px; }
+    .tnc-content strong { color: #00ffc8; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       SCREEN 1 — LOADING
+       ============================================================ -->
+  <div id="loadingScreen" aria-live="polite">
+    <div class="loading-ring"></div>
+    <div class="loading-text">Gpyth Chat</div>
+    <div class="loading-sub">Memuat...</div>
+
+    <!-- Audio tag (WAJIB sesuai instruksi) -->
+    <audio id="loadingAudio" loop preload="auto">
+      <!-- Tambahkan <source src="music.mp3" type="audio/mpeg"> bila mau backsound -->
+    </audio>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 2 — TERMS & CONDITIONS
+       ============================================================ -->
+  <div id="tncScreen" class="screen hidden" role="dialog" aria-modal="true">
+    <div class="card">
+      <div class="brand">Gpyth Chat</div>
+      <div class="brand-sub">SYARAT &amp; KETENTUAN</div>
+
+      <div class="tnc-content">
+        <p><strong>1. Konten.</strong> Dilarang mengunggah/menyebarkan konten ilegal, SARA, pornografi, atau yang melanggar hukum.</p>
+        <p><strong>2. Privasi.</strong> Data yang kamu unggah (foto, voice note, chat) tersimpan di Firestore dan menjadi tanggung jawabmu.</p>
+        <p><strong>3. Etika.</strong> Jaga sopan santun antar pengguna. Harassment tidak ditoleransi.</p>
+        <p><strong>4. Moderasi.</strong> Admin berhak menghapus pesan/akun yang melanggar tanpa pemberitahuan.</p>
+        <p><strong>5. Data.</strong> Semua gambar dikompres di perangkatmu sebelum diunggah (Base64) — Firebase Storage tidak digunakan.</p>
+        <p><strong>6. Persetujuan.</strong> Dengan menekan tombol <em>Saya Setuju</em>, kamu menerima semua ketentuan di atas.</p>
+      </div>
+
+      <button id="btnAcceptTnc" class="btn-primary" type="button">Saya Setuju</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCREEN 3 — AUTH (LOGIN / REGISTER / GUEST)
+       ============================================================ -->
+  <div id="authScreen" class="screen hidden" role="dialog" aria-modal="true">
+    <div class="card">
+      <div class="brand">Gpyth Chat</div>
+      <div class="brand-sub">CHATTING · FEED · CALL</div>
+
+      <div id="authError" class="error" role="alert"></div>
+
+      <!-- ==== LOGIN FORM ==== -->
+      <form id="loginForm" class="auth-form" autocomplete="on" novalidate>
+        <input id="loginUsername" type="text"
+               placeholder="Username" autocomplete="username"
+               autocapitalize="none" spellcheck="false" required />
+        <input id="loginPassword" type="password"
+               placeholder="Password" autocomplete="current-password" required />
+        <button type="submit" id="btnLogin" class="btn-primary">Masuk</button>
+        <button type="button" id="btnShowRegister" class="btn-secondary">
+          Belum punya akun? Daftar
+        </button>
+      </form>
+
+      <!-- ==== REGISTER FORM ==== -->
+      <form id="registerForm" class="auth-form hidden" autocomplete="on" novalidate>
+        <input id="regUsername" type="text"
+               placeholder="Username (3–20, a-z 0-9 _)"
+               autocomplete="username" autocapitalize="none" spellcheck="false" required />
+        <input id="regPassword" type="password"
+               placeholder="Password (min 6 karakter)"
+               autocomplete="new-password" required />
+        <input id="regConfirm" type="password"
+               placeholder="Konfirmasi Password"
+               autocomplete="new-password" required />
+        <button type="submit" id="btnRegister" class="btn-primary">Daftar</button>
+        <button type="button" id="btnShowLogin" class="btn-secondary">
+          Sudah punya akun? Masuk
+        </button>
+      </form>
+
+      <div class="divider">atau</div>
+      <button id="btnGuest" type="button" class="btn-ghost">Masuk sebagai Tamu (Read-only)</button>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       SCRIPT ENTRY — MODULE
+       ============================================================ -->
+  <script type="module" src="app.js"></script>
+</body>
+</html>

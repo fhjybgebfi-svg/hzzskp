@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#050508" />
+  <title>Gpyth Chat</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <div id="auth-loading" class="auth-loading">
+    <div class="spinner-orb"></div>
+    <p class="loading-text">Memuat...</p>
+  </div>
+
+  <div id="app" class="app hidden">
+    <header class="topbar">
+      <div class="topbar-left">
+        <img id="topbar-avatar" class="topbar-avatar" alt="avatar" />
+        <div class="topbar-info">
+          <div class="topbar-name">
+            <span id="topbar-username">...</span>
+            <span id="topbar-verified" class="badge-verified hidden">✓</span>
+            <span id="topbar-admin" class="badge-admin hidden">👑</span>
+            <span id="topbar-premium" class="badge-premium hidden">💎</span>
+          </div>
+          <div id="topbar-status" class="topbar-status">Online</div>
+        </div>
+      </div>
+      <div class="topbar-actions"><button id="btn-menu" class="btn-icon" title="Menu">☰</button></div>
+    </header>
+
+    <main class="main-content">
+      <section id="tab-beranda" class="tab-panel active">
+        <div class="tab-header"><h2 class="tab-title">Beranda</h2></div>
+        <div id="feed-container" class="feed-container"><div class="feed-loading"><div class="spinner-orb" style="width:44px;height:44px;"></div></div></div>
+        <button id="fab-beranda" class="fab" title="Buat Post">+</button>
+      </section>
+
+      <section id="tab-chat" class="tab-panel">
+        <div class="tab-header"><h2 class="tab-title">Chat</h2></div>
+        <div id="chat-list-container" class="chat-list"><div class="empty-state"><div class="empty-icon">💬</div><div class="empty-title">Belum ada chat</div></div></div>
+        <button id="fab-chat" class="fab" title="Chat Baru">✏️</button>
+      </section>
+
+      <section id="tab-grup" class="tab-panel">
+        <div class="tab-header"><h2 class="tab-title">Grup</h2></div>
+        <div id="grup-list-container" class="grup-list"><div class="empty-state"><div class="empty-icon">👥</div><div class="empty-title">Belum ada grup</div></div></div>
+        <button id="fab-grup" class="fab" title="Buat Grup">+</button>
+      </section>
+
+      <section id="tab-profil" class="tab-panel">
+        <div class="profil-header">
+          <div id="profil-banner" class="profil-banner"></div>
+          <div class="profil-avatar-wrap"><img id="profil-avatar" class="profil-avatar" alt="avatar" /></div>
+        </div>
+        <div class="profil-info">
+          <h2 class="profil-name">
+            <span id="profil-username">...</span>
+            <span id="profil-verified" class="badge-verified hidden">✓</span>
+            <span id="profil-admin" class="badge-admin hidden">👑</span>
+            <span id="profil-premium" class="badge-premium hidden">💎</span>
+          </h2>
+          <p id="profil-bio" class="profil-bio">Belum ada bio.</p>
+          <div class="profil-stats">
+            <div class="stat-item"><span class="stat-value" id="stat-followers">0</span><span class="stat-label">Followers</span></div>
+            <div class="stat-item"><span class="stat-value" id="stat-following">0</span><span class="stat-label">Following</span></div>
+            <div class="stat-item"><span class="stat-value" id="stat-posts">0</span><span class="stat-label">Posts</span></div>
+          </div>
+          <div class="profil-actions">
+            <button id="btn-edit-profil" class="btn-outline">Edit Profil</button>
+            <button id="btn-bagikan" class="btn-outline">Bagikan</button>
+          </div>
+        </div>
+        <div class="profil-menu">
+          <button class="menu-item" data-menu="musik"><span class="menu-icon">🎵</span><span class="menu-label">Musik Profil</span><span class="menu-arrow">›</span></button>
+          <button class="menu-item" data-menu="premium"><span class="menu-icon">💎</span><span class="menu-label">Gpyth Premium</span><span class="menu-arrow">›</span></button>
+          <button class="menu-item" data-menu="admin" id="menu-admin"><span class="menu-icon">👑</span><span class="menu-label">Dashboard Admin</span><span class="menu-arrow">›</span></button>
+          <button class="menu-item" data-menu="shop"><span class="menu-icon">🛒</span><span class="menu-label">Shop</span><span class="menu-arrow">›</span></button>
+          <button class="menu-item menu-danger" id="btn-logout"><span class="menu-icon">⏻</span><span class="menu-label">Keluar</span><span class="menu-arrow">›</span></button>
+        </div>
+      </section>
+    </main>
+
+    <nav class="bottom-nav">
+      <button id="nav-beranda" class="nav-btn active" data-tab="beranda"><span class="nav-icon">🏠</span><span class="nav-label">Beranda</span></button>
+      <button id="nav-chat" class="nav-btn" data-tab="chat"><span class="nav-icon">💬</span><span class="nav-label">Chat</span></button>
+      <button id="nav-grup" class="nav-btn" data-tab="grup"><span class="nav-icon">👥</span><span class="nav-label">Grup</span></button>
+      <button id="nav-profil" class="nav-btn" data-tab="profil"><span class="nav-icon">👤</span><span class="nav-label">Profil</span></button>
+    </nav>
+  </div>
+
+  <div id="chat-room" class="chat-room hidden">
+    <div class="chat-room-header">
+      <button id="chat-room-back" class="btn-icon" title="Kembali">←</button>
+      <div class="chat-room-info">
+        <div id="chat-room-name" class="chat-room-name">...</div>
+        <div id="chat-room-status" class="chat-room-status">Online</div>
+      </div>
+      <button id="chat-room-call" class="btn-icon hidden" title="Panggil">📞</button>
+      <div id="chat-room-avatar" class="chat-room-avatar">👥</div>
+    </div>
+    <div id="chat-pin-banner" class="chat-pin-banner hidden">
+      <span class="chat-pin-banner-icon">📌</span><div class="chat-pin-banner-text"></div><button id="chat-pin-close" class="chat-pin-banner-close">×</button>
+    </div>
+    <div id="chat-messages" class="chat-messages"><div class="empty-state"><div class="empty-icon">💬</div><div class="empty-title">Belum ada pesan</div></div></div>
+    <div id="reply-preview" class="reply-preview hidden">
+      <div class="reply-preview-content"><div class="reply-preview-name"></div><div class="reply-preview-text"></div></div>
+      <button id="reply-cancel" class="reply-preview-close">×</button>
+    </div>
+    <div id="capsule-indicator" class="capsule-indicator hidden">
+      <span>⏰ Pesan berikutnya terkunci</span><button id="capsule-indicator-clear">×</button>
+    </div>
+    <div id="record-overlay" class="record-overlay hidden">
+      <div class="record-dot"></div><div id="record-timer" class="record-timer">00:00</div><div class="record-hint">Merekam...</div>
+      <button id="record-cancel" class="record-cancel-btn">Batal</button><button id="record-stop" class="record-stop-btn">Kirim</button>
+    </div>
+    <div class="chat-input-bar">
+      <button id="chat-capsule-btn" class="chat-attach-btn" title="Kapsul waktu">⏰</button>
+      <button id="chat-attach-btn" class="chat-attach-btn" title="Kirim foto">📎</button>
+      <input type="text" id="chat-input" placeholder="Ketik pesan..." autocomplete="off" />
+      <button id="chat-mic-btn" class="chat-mic-btn" title="Rekam suara">🎤</button>
+      <button id="chat-send-btn" class="chat-send-btn" title="Kirim">➤</button>
+    </div>
+    <input type="file" id="chat-image-file" accept="image/*" hidden />
+  </div>
+
+  <div id="composer-modal" class="composer-modal hidden">
+    <div id="composer-backdrop" class="composer-backdrop"></div>
+    <div class="composer-content">
+      <div class="composer-header"><button id="composer-close" class="btn-icon">×</button><h3 class="composer-title">Buat Postingan</h3><button id="composer-submit" class="composer-submit-btn">Posting</button></div>
+      <div class="composer-body">
+        <textarea id="composer-text" placeholder="Apa yang lu pikirkan?" maxlength="500" rows="4"></textarea>
+        <div id="composer-image-preview" class="composer-image-preview hidden"><img id="composer-image" alt="preview" /><button id="composer-image-remove" class="composer-image-remove">×</button></div>
+      </div>
+      <div class="composer-footer"><label class="composer-img-btn" for="composer-file">📷 Foto<input id="composer-file" type="file" accept="image/*" hidden /></label><span id="composer-counter" class="composer-counter">0/500</span></div>
+    </div>
+  </div>
+
+  <div id="edit-profil-modal" class="modal hidden">
+    <div class="modal-backdrop" id="edit-profil-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header"><button id="edit-profil-close" class="btn-icon">×</button><h3 class="modal-title">Edit Profil</h3><button id="edit-profil-save" class="modal-save-btn">Simpan</button></div>
+      <div class="modal-body">
+        <div class="edit-banner-section"><div id="edit-banner-preview" class="edit-banner-preview"></div><button id="edit-banner-btn" class="edit-photo-btn">📷 Ganti Banner</button><input id="edit-banner-file" type="file" accept="image/*" hidden /></div>
+        <div class="edit-avatar-section">
+          <div class="edit-avatar-wrap"><img id="edit-avatar-preview" class="edit-avatar-preview" alt="avatar" /><button id="edit-avatar-btn" class="edit-avatar-btn">📷</button></div>
+          <input id="edit-avatar-file" type="file" accept="image/*" hidden /><p class="edit-avatar-hint">Tap foto untuk atur posisi</p>
+        </div>
+        <div class="edit-field"><label class="edit-label">Username</label><input id="edit-username-input" type="text" readonly class="edit-input" /></div>
+        <div class="edit-field"><label class="edit-label">Bio</label><textarea id="edit-bio-input" maxlength="150" rows="3" class="edit-textarea"></textarea><span id="edit-bio-counter" class="edit-counter">0/150</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="cropper-modal" class="modal hidden">
+    <div class="modal-backdrop" id="cropper-backdrop"></div>
+    <div class="modal-content cropper-content">
+      <div class="modal-header"><button id="cropper-close" class="btn-icon">×</button><h3 class="modal-title">Atur Foto</h3><button id="cropper-save" class="modal-save-btn">Terapkan</button></div>
+      <div class="cropper-body"><img id="cropper-image" alt="crop" /></div>
+    </div>
+  </div>
+
+  <div id="new-chat-modal" class="modal hidden">
+    <div class="modal-backdrop" id="new-chat-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header"><button id="new-chat-close" class="btn-icon">×</button><h3 class="modal-title">Chat Baru</h3><div class="modal-spacer"></div></div>
+      <div class="modal-body"><input type="text" id="search-user-input" class="search-user-input" placeholder="Cari username..." /><div id="search-user-results" class="search-user-results"><p class="search-user-hint">Ketik username lengkap.</p></div></div>
+    </div>
+  </div>
+
+  <div id="new-group-modal" class="modal hidden">
+    <div class="modal-backdrop" id="new-group-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header"><button id="new-group-close" class="btn-icon">×</button><h3 class="modal-title">Grup</h3><div class="modal-spacer"></div></div>
+      <div class="modal-body">
+        <div class="group-tabs"><button id="group-tab-create" class="group-tab active">Buat Grup</button><button id="group-tab-join" class="group-tab">Join Grup</button></div>
+        <div id="group-create-panel" class="group-panel"><input type="text" id="group-name-input" class="edit-input" placeholder="Nama grup (max 40)" maxlength="40" /><button id="group-create-btn" class="btn-primary" style="margin-top:12px;">Buat Grup</button></div>
+        <div id="group-join-panel" class="group-panel hidden"><input type="text" id="group-id-input" class="edit-input" placeholder="HZ-XXXX" maxlength="7" style="text-transform:uppercase;" /><button id="group-join-btn" class="btn-primary" style="margin-top:12px;">Join Grup</button></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="admin-modal" class="modal hidden">
+    <div class="modal-backdrop" id="admin-backdrop"></div>
+    <div class="modal-content admin-content">
+      <div class="modal-header"><button id="admin-close" class="btn-icon">×</button><h3 class="modal-title">👑 Admin Dashboard</h3><div class="modal-spacer"></div></div>
+      <div class="admin-tabs"><button id="admin-tab-users" class="admin-tab active" data-tab="users">Users</button><button id="admin-tab-splash" class="admin-tab" data-tab="splash">Splash</button><button id="admin-tab-stats" class="admin-tab" data-tab="stats">Stats</button></div>
+      <div class="modal-body" style="padding:12px;">
+        <div id="admin-users-panel" class="admin-panel"><input type="text" id="admin-user-search" class="edit-input" placeholder="Cari username..." style="margin-bottom:10px;" /><div id="admin-users-list" class="admin-users-list">Memuat...</div></div>
+        <div id="admin-splash-panel" class="admin-panel hidden">
+          <label class="edit-label">Banner Splash</label><div id="admin-splash-preview" class="admin-splash-preview"></div><button id="admin-splash-upload" class="btn-secondary" style="margin-top:8px;">📷 Ganti Banner</button><input type="file" id="admin-splash-file" accept="image/*" hidden />
+          <label class="edit-label" style="margin-top:14px;">Teks Splash</label><textarea id="admin-splash-text" class="edit-textarea" rows="4" maxlength="1000"></textarea>
+          <label class="edit-label" style="margin-top:14px;">Download Link</label><input type="text" id="admin-splash-link" class="edit-input" placeholder="https://t.me/maklov4" />
+          <button id="admin-splash-save" class="btn-primary" style="margin-top:14px;">Simpan Splash</button>
+        </div>
+        <div id="admin-stats-panel" class="admin-panel hidden"><div id="admin-stats-content" class="admin-stats-content">Memuat...</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div id="premium-modal" class="modal hidden">
+    <div class="modal-backdrop" id="premium-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header"><button id="premium-close" class="btn-icon">×</button><h3 class="modal-title">💎 Gpyth Premium</h3><div class="modal-spacer"></div></div>
+      <div class="modal-body">
+        <div class="premium-hero"><div class="premium-icon">💎</div><h2>Gpyth Premium</h2><p class="premium-sub">Upgrade pengalaman lu</p></div>
+        <ul class="premium-benefits"><li>✓ Badge Premium 💎</li><li>✓ Centang Biru</li><li>✓ Upload Lebih Besar</li><li>✓ Prioritas Support</li></ul>
+        <a href="https://t.me/maklov1" target="_blank" class="premium-cta">💬 Hubungi Admin</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="capsule-modal" class="modal hidden">
+    <div class="modal-backdrop" id="capsule-backdrop"></div>
+    <div class="modal-content">
+      <div class="modal-header"><button id="capsule-close" class="btn-icon">×</button><h3 class="modal-title">⏰ Kapsul Waktu</h3><button id="capsule-save" class="modal-save-btn">Set</button></div>
+      <div class="modal-body"><p class="capsule-desc">Pesan berikutnya akan terkunci sampai waktu yang ditentukan.</p><label class="edit-label">Buka pada:</label><input type="datetime-local" id="capsule-datetime" class="edit-input" /></div>
+    </div>
+  </div>
+
+  <div id="call-incoming-modal" class="call-modal hidden">
+    <div class="call-modal-content">
+      <div class="call-avatar">📞</div><h3 id="call-incoming-name">...</h3><p class="call-status">Panggilan suara masuk...</p>
+      <div class="call-actions"><button id="call-reject" class="call-btn reject">✕</button><button id="call-accept" class="call-btn accept">📞</button></div>
+    </div>
+  </div>
+
+  <div id="call-ongoing-modal" class="call-modal hidden">
+    <div class="call-modal-content">
+      <div class="call-avatar">📞</div><h3 id="call-ongoing-name">...</h3><p class="call-status" id="call-ongoing-status">Terhubung</p>
+      <div class="call-actions"><button id="call-mute" class="call-btn mute">🎤</button><button id="call-end" class="call-btn reject">✕</button></div>
+    </div>
+  </div>
+
+  <div id="reaction-picker" class="reaction-picker hidden"></div>
+  <div id="toast" class="toast"></div>
+  <audio id="remote-audio" autoplay style="display:none;"></audio>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+  <script type="module" src="main.js"></script>
+</body>
+</html>
